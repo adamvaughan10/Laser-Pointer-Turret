@@ -7,8 +7,8 @@ try:
 except ImportError:
     LGPIOFactory = None
 
-SERVO1_PIN = 18  # y-axis
-SERVO2_PIN = 17  # x-axis
+SERVO1_PIN = 18  # top (y-axis)
+SERVO2_PIN = 17  # bottom (x-axis)
 TOP_CENTER = 120
 BOTTOM_CENTER = 100
 TOP_BOUND = 10
@@ -132,23 +132,24 @@ def move_both(current_angles, current_location, target_location, step=2, steps=1
 
     target_angle_x = clamp(
         angle_x + direction_x * step,
-        top_or_bottom="bottom",
+        top_or_bottom="bottom"
     )
     target_angle_y = clamp(
         angle_y + direction_y * step,
-        top_or_bottom="top",
+        top_or_bottom="top"
     )
 
     return move_both_angles(
         pwm1,
-        angle_x,
-        target_angle_x,
-        pwm2,
         angle_y,
         target_angle_y,
+        pwm2,
+        angle_x,
+        target_angle_x,
         steps,
         step_delay,
     )
+    
 
 def move_both_angles(pwm1, current1, target1, pwm2, current2, target2, steps, step_delay):
     for i in range(1, steps + 1):
@@ -160,7 +161,7 @@ def move_both_angles(pwm1, current1, target1, pwm2, current2, target2, steps, st
 
     pwm1.ChangeDutyCycle(0)  # stop jitter
     pwm2.ChangeDutyCycle(0)  # stop jitter
-    return target1, target2
+    return pos2, pos1  # return (angle_x, angle_y)
 
 # def move_vert(current_angle, current_y, target_y, step=2):
 #     direction = 1 if target_y > current_y else -1
@@ -209,4 +210,4 @@ def center(pwm1, pwm2):
     time.sleep(1)
     pwm1.ChangeDutyCycle(0)
     pwm2.ChangeDutyCycle(0)
-    return BOTTOM_CENTER, TOP_CENTER  # return current angles
+    return BOTTOM_CENTER, TOP_CENTER  # return current angles (x,y)
