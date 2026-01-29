@@ -69,17 +69,22 @@ def main():
                     angles = sc.center(pwm1, pwm2)
                 print("Reset: cleared dot and recentered servos.")
             elif key in (81, 82, 83, 84, ord("w"), ord("a"), ord("s"), ord("d")):
-                new_x, new_y = angles
                 if key in (82, ord("w")):  # up
-                    new_y = sc.clamp(new_y - manual_step, "top")
+                    target_location = (0, 1)
                 elif key in (84, ord("s")):  # down
-                    new_y = sc.clamp(new_y + manual_step, "top")
+                    target_location = (0, -1)
                 elif key in (81, ord("a")):  # left
-                    new_x = sc.clamp(new_x - manual_step, "bottom")
-                elif key in (83, ord("d")):  # right
-                    new_x = sc.clamp(new_x + manual_step, "bottom")
-                sc.move_both_angles(pwm1, angles[1], new_y, pwm2, angles[0], new_x, 1, 0.02)
-                angles = (new_x, new_y)
+                    target_location = (-1, 0)
+                else:  # right
+                    target_location = (1, 0)
+                angles = sc.move_both(
+                    angles,
+                    (0, 0),
+                    target_location,
+                    step=manual_step,
+                    steps=1,
+                    step_delay=0.02,
+                )
             if key in (ord("q"), 27):
                 break
     except KeyboardInterrupt:

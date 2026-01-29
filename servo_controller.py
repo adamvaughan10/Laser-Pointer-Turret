@@ -116,13 +116,14 @@ def navigate_to_target(get_position, target_location, current_angles, tolerance=
             (current_x, current_y),
             (target_x, target_y),
             step=step,
-            steps=1,
+            steps=5,
             step_delay=0.05,
         )
+        time.sleep(0.5)
 
     return (angle_x, angle_y)
 
-def move_both(current_angles, current_location, target_location, step=2, steps=10, step_delay=0.05):
+def move_both(current_angles, current_location, target_location, step=1, steps=10, step_delay=0.05):
     angle_x, angle_y = current_angles
     current_x, current_y = current_location
     target_x, target_y = target_location
