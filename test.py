@@ -41,68 +41,55 @@ STEP_DELAY = 1
 #         logger.info("test_navigate_to_target: cleanup GPIO")
 #         sc.cleanup_gpio(pwm1, pwm2)
 
-def test_move_vert():
-    logger.info("test_move_vert: setup GPIO")
+def test_move_both():
+    logger.info("test_move_both: setup GPIO")
     pwm1, pwm2 = sc.init_gpio()
     sc.pwm1 = pwm1
     sc.pwm2 = pwm2
 
     try:
-        logger.info("test_move_vert: startup")
+        logger.info("test_move_both: startup")
         angle_x, angle_y = sc.center(pwm1, pwm2)
-        logger.info("test_move_vert: start angle %s", angle_y)
-        time.sleep(STEP_DELAY)
-        # Test moving up
-        logger.info("test_move_vert: move up")
-        new_angle = sc.move_vert(angle_y, 50, 70, step=5)
-        logger.info("test_move_vert: new angle %s", new_angle)
-        assert new_angle > angle_y
+        logger.info("test_move_both: start angles x=%s y=%s", angle_x, angle_y)
         time.sleep(STEP_DELAY)
 
-        # Test moving down
-        logger.info("test_move_vert: move down")
-        new_angle = sc.move_vert(angle_y, 70, 50, step=5)
-        logger.info("test_move_vert: new angle %s", new_angle)
-        assert new_angle < angle_y
+        # Move both axes toward higher target
+        logger.info("test_move_both: move toward higher target")
+        new_angle_x, new_angle_y = sc.move_both(
+            (angle_x, angle_y),
+            (50, 50),
+            (70, 70),
+            step=5,
+            steps=5,
+            step_delay=0.05,
+        )
+        logger.info("test_move_both: new angles x=%s y=%s", new_angle_x, new_angle_y)
+        assert new_angle_x >= angle_x
+        assert new_angle_y >= angle_y
+        time.sleep(STEP_DELAY)
+
+        # Move both axes toward lower target
+        logger.info("test_move_both: move toward lower target")
+        newer_angle_x, newer_angle_y = sc.move_both(
+            (new_angle_x, new_angle_y),
+            (70, 70),
+            (50, 50),
+            step=5,
+            steps=5,
+            step_delay=0.05,
+        )
+        logger.info("test_move_both: new angles x=%s y=%s", newer_angle_x, newer_angle_y)
+        assert newer_angle_x <= new_angle_x
+        assert newer_angle_y <= new_angle_y
         time.sleep(STEP_DELAY)
 
     finally:
-        logger.info("test_move_vert: cleanup GPIO")
-        sc.cleanup_gpio(pwm1, pwm2)
-
-def test_move_horiz():
-    logger.info("test_move_horiz: setup GPIO")
-    pwm1, pwm2 = sc.init_gpio()
-    sc.pwm1 = pwm1
-    sc.pwm2 = pwm2
-
-    try:
-        logger.info("test_move_horiz: startup")
-        angle_x, angle_y = sc.center(pwm1, pwm2)
-        logger.info("test_move_horiz: start angle %s", angle_x)
-        time.sleep(STEP_DELAY)
-        # Test moving right
-        logger.info("test_move_horiz: move right")
-        new_angle = sc.move_horiz(angle_x, 50, 70, step=20)
-        logger.info("test_move_horiz: new angle %s", new_angle)
-        assert new_angle > angle_x
-        time.sleep(STEP_DELAY)
-
-        # Test moving left
-        logger.info("test_move_horiz: move left")
-        new_angle = sc.move_horiz(angle_x, 70, 50, step=20)
-        logger.info("test_move_horiz: new angle %s", new_angle)
-        assert new_angle < angle_x
-        time.sleep(STEP_DELAY)
-
-    finally:
-        logger.info("test_move_horiz: cleanup GPIO")
+        logger.info("test_move_both: cleanup GPIO")
         sc.cleanup_gpio(pwm1, pwm2)
 
 def run_all_tests():
     # test_navigate_to_target()
-    test_move_vert()
-    test_move_horiz()
+    test_move_both()
 
 if __name__ == "__main__":
     run_all_tests()
