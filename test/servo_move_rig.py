@@ -96,6 +96,8 @@ def main():
             print(f"Current: ({current_x}, {current_y})")
     finally:
         if pwm1 is not None and pwm2 is not None:
+            sc.pwm1 = None
+            sc.pwm2 = None
             sc.cleanup_gpio(pwm1, pwm2)
 
 

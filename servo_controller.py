@@ -1,8 +1,8 @@
 import RPi.GPIO as GPIO
 import time
 
-SERVO1_PIN = 18  # BCM numbering
-SERVO2_PIN = 17
+SERVO1_PIN = 18  #y-axis
+SERVO2_PIN = 17  #x-axis
 TOP_MIN = 75
 TOP_MAX = 165
 BOTTOM_MIN = 40
@@ -28,16 +28,26 @@ def init_gpio():
     return pwm1, pwm2
 
 def cleanup_gpio(pwm1, pwm2):
-    pwm1.stop()
-    pwm2.stop()
-    GPIO.cleanup()
+    if pwm1 is not None:
+        pwm1.stop()
+    if pwm2 is not None:
+        pwm2.stop()
+    # Force PWM __del__ to run before GPIO.cleanup to avoid lgpio errors.
+    try:
+        import gc
 
-def navigate_to_target(current_location, target_location, tolerance=2, step=2):
+        del pwm1
+        del pwm2
+        gc.collect()
+    finally:
+        GPIO.cleanup()
+
+def navigate_to_target(current_location, target_location, angles, tolerance=2, step=2):
     """
     current_location: tuple (x, y)
     target_location: tuple (x, y)
     """
-
+    angles_y, angles_x = angles
     current_x, current_y = current_location
     target_x, target_y = target_location
 
@@ -53,30 +63,45 @@ def navigate_to_target(current_location, target_location, tolerance=2, step=2):
 
     return (current_x, current_y)
 
-def move_vert(current_y, target_y, step=2):
+def move_vert(current_angle, current_y, target_y, step=2):
     direction = 1 if target_y > current_y else -1
-    next_y = current_y + direction * step
-    if direction > 0:
-        next_y = min(next_y, target_y)
-    else:
-        next_y = max(next_y, target_y)
-    next_y = max(BOTTOM_MIN, min(BOTTOM_MAX, next_y))
-    duty = angle_to_duty(next_y)
+    # next_y = current_y + direction * step
+    # if direction > 0:
+    #     next_y = min(next_y, target_y)
+    # else:
+    #     next_y = max(next_y, target_y)
+    # next_y = max(BOTTOM_MIN, min(BOTTOM_MAX, next_y))
+    next_angle = current_angle + direction * step
+    duty = angle_to_duty(next_angle)
     pwm2.ChangeDutyCycle(duty)
     time.sleep(0.05)
     pwm2.ChangeDutyCycle(0)  # stop jitter
-    return next_y
+    return next_angle
 
-def move_horiz(current_x, target_x, step=2):
+def move_horiz(current_angle, current_x, target_x, step=2):
     direction = 1 if target_x > current_x else -1
-    next_x = current_x + direction * step
-    if direction > 0:
-        next_x = min(next_x, target_x)
-    else:
-        next_x = max(next_x, target_x)
-    next_x = max(TOP_MIN, min(TOP_MAX, next_x))
-    duty = angle_to_duty(next_x)
+    # next_x = current_x + direction * step
+    # if direction > 0:
+    #     next_x = min(next_x, target_x)
+    # else:
+    #     next_x = max(next_x, target_x)
+    # next_x = max(TOP_MIN, min(TOP_MAX, next_x))
+    next_angle = current_angle + direction * step
+    duty = angle_to_duty(next_angle)
     pwm1.ChangeDutyCycle(duty)
     time.sleep(0.05)
     pwm1.ChangeDutyCycle(0)  # stop jitter
-    return next_x
+    return next_angle
+
+def startup(pwm1, pwm2):
+    # Move to center position
+    center1 = (TOP_MIN + TOP_MAX) // 2
+    center2 = (BOTTOM_MIN + BOTTOM_MAX) // 2
+    duty1 = angle_to_duty(center1)
+    duty2 = angle_to_duty(center2)
+    pwm1.ChangeDutyCycle(duty1)
+    pwm2.ChangeDutyCycle(duty2)
+    time.sleep(1)
+    pwm1.ChangeDutyCycle(0)
+    pwm2.ChangeDutyCycle(0)
+    return center1, center2 # return current angles

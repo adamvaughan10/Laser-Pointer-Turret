@@ -28,6 +28,8 @@ def main():
         sc.pwm1 = pwm1
         sc.pwm2 = pwm2
 
+        angles = sc.startup(pwm1, pwm2)
+
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -42,7 +44,7 @@ def main():
                 if current is None:
                     print("No dot detected; skipping navigate_to_target.")
                 else:
-                    sc.navigate_to_target(current, click)
+                    sc.navigate_to_target(current, click, angles)
                 last_click_seen = click
 
             cv2.imshow(cf.WINDOW_NAME, display)
