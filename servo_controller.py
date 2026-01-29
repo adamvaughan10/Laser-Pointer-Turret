@@ -9,10 +9,10 @@ except ImportError:
 
 SERVO1_PIN = 18  #y-axis
 SERVO2_PIN = 17  #x-axis
-TOP_MIN = 75
-TOP_MAX = 165
-BOTTOM_MIN = 40
-BOTTOM_MAX = 160
+TOP_MIN = 70
+TOP_MAX = 110
+BOTTOM_MIN = 70
+BOTTOM_MAX = 110
 SERVO_MIN_PULSE = 0.0005
 SERVO_MAX_PULSE = 0.0025
 
@@ -29,6 +29,9 @@ def angle_to_duty(angle):
 def duty_to_angle(duty):
     angle = (duty - 2.5) / 10.0 * 180.0
     return max(0.0, min(180.0, angle))
+
+def clamp(value, min_value, max_value):
+    return max(min_value, min(max_value, value))
 
 class ServoAdapter:
     def __init__(self, servo):
@@ -92,7 +95,6 @@ def navigate_to_target(get_position, target_location, current_angles, tolerance=
     """
     angle_x, angle_y = current_angles
     target_x, target_y = target_location
-    current_x, current_y = get_position()
 
     for _ in range(max_steps):
         current = get_position()
@@ -103,15 +105,50 @@ def navigate_to_target(get_position, target_location, current_angles, tolerance=
         if abs(current_x - target_x) <= tolerance and abs(current_y - target_y) <= tolerance:
             return (angle_x, angle_y)
 
-        # Move vertically if needed
-        if abs(current_y - target_y) > tolerance:
-            angle_y = move_vert(angle_y, current_y, target_y, step=step)
-    
-        # Move horizontally if needed
-        if abs(current_x - target_x) > tolerance:
-            angle_x = move_horiz(angle_x, current_x, target_x, step=step)
+        angle_x, angle_y = move_both(
+            (angle_x, angle_y),
+            (current_x, current_y),
+            (target_x, target_y),
+            step=step,
+            steps=1,
+            step_delay=0.05,
+        )
 
     return (angle_x, angle_y)
+
+def move_both(current_angles, current_location, target_location, step=2, steps=10, step_delay=0.05):
+    angle_x, angle_y = current_angles
+    current_x, current_y = current_location
+    target_x, target_y = target_location
+
+    direction_x = 1 if target_x > current_x else -1 if target_x < current_x else 0
+    direction_y = 1 if target_y > current_y else -1 if target_y < current_y else 0
+
+    target_angle_x = clamp(angle_x + direction_x * step, TOP_MIN, TOP_MAX)
+    target_angle_y = clamp(angle_y + direction_y * step, BOTTOM_MIN, BOTTOM_MAX)
+
+    return move_both_angles(
+        pwm1,
+        angle_x,
+        target_angle_x,
+        pwm2,
+        angle_y,
+        target_angle_y,
+        steps,
+        step_delay,
+    )
+
+def move_both_angles(pwm1, current1, target1, pwm2, current2, target2, steps, step_delay):
+    for i in range(1, steps + 1):
+        pos1 = current1 + (target1 - current1) * (i / steps)
+        pos2 = current2 + (target2 - current2) * (i / steps)
+        pwm1.ChangeDutyCycle(angle_to_duty(pos1))
+        pwm2.ChangeDutyCycle(angle_to_duty(pos2))
+        time.sleep(step_delay)
+
+    pwm1.ChangeDutyCycle(0)  # stop jitter
+    pwm2.ChangeDutyCycle(0)  # stop jitter
+    return target1, target2
 
 def move_vert(current_angle, current_y, target_y, step=2):
     direction = 1 if target_y > current_y else -1
@@ -121,7 +158,7 @@ def move_vert(current_angle, current_y, target_y, step=2):
     # else:
     #     next_y = max(next_y, target_y)
     # next_y = max(BOTTOM_MIN, min(BOTTOM_MAX, next_y))
-    next_angle = current_angle + direction * step
+    next_angle = clamp(current_angle + direction * step, BOTTOM_MIN, BOTTOM_MAX)
     duty = angle_to_duty(next_angle)
     pwm2.ChangeDutyCycle(duty)
     time.sleep(0.05)
@@ -136,7 +173,7 @@ def move_horiz(current_angle, current_x, target_x, step=2):
     # else:
     #     next_x = max(next_x, target_x)
     # next_x = max(TOP_MIN, min(TOP_MAX, next_x))
-    next_angle = current_angle + direction * step
+    next_angle = clamp(current_angle + direction * step, TOP_MIN, TOP_MAX)
     duty = angle_to_duty(next_angle)
     pwm1.ChangeDutyCycle(duty)
     time.sleep(0.05)
