@@ -49,38 +49,73 @@ def test_move_both():
 
     try:
         logger.info("test_move_both: startup")
-        angle_x, angle_y = sc.center(pwm1, pwm2)
-        logger.info("test_move_both: start angles x=%s y=%s", angle_x, angle_y)
-        time.sleep(STEP_DELAY)
 
-        # Move both axes toward higher target
-        logger.info("test_move_both: move toward higher target")
-        new_angle_x, new_angle_y = sc.move_both(
+        # Move up (increase y)
+        angle_x, angle_y = sc.center(pwm1, pwm2)
+        logger.info("test_move_both: recentered x=%s y=%s", angle_x, angle_y)
+        time.sleep(STEP_DELAY)
+        logger.info("test_move_both: move up")
+        up_x, up_y = sc.move_both(
             (angle_x, angle_y),
             (50, 50),
-            (70, 70),
+            (50, 70),
             step=5,
             steps=5,
             step_delay=0.05,
         )
-        logger.info("test_move_both: new angles x=%s y=%s", new_angle_x, new_angle_y)
-        assert new_angle_x >= angle_x
-        assert new_angle_y >= angle_y
+        logger.info("test_move_both: after up x=%s y=%s", up_x, up_y)
+        assert up_y >= angle_y
         time.sleep(STEP_DELAY)
 
-        # Move both axes toward lower target
-        logger.info("test_move_both: move toward lower target")
-        newer_angle_x, newer_angle_y = sc.move_both(
-            (new_angle_x, new_angle_y),
-            (70, 70),
+        # Move down (decrease y)
+        angle_x, angle_y = sc.center(pwm1, pwm2)
+        logger.info("test_move_both: recentered x=%s y=%s", angle_x, angle_y)
+        time.sleep(STEP_DELAY)
+        logger.info("test_move_both: move down")
+        down_x, down_y = sc.move_both(
+            (angle_x, angle_y),
+            (50, 70),
             (50, 50),
             step=5,
             steps=5,
             step_delay=0.05,
         )
-        logger.info("test_move_both: new angles x=%s y=%s", newer_angle_x, newer_angle_y)
-        assert newer_angle_x <= new_angle_x
-        assert newer_angle_y <= new_angle_y
+        logger.info("test_move_both: after down x=%s y=%s", down_x, down_y)
+        assert down_y <= angle_y
+        time.sleep(STEP_DELAY)
+
+        # Move right (increase x)
+        angle_x, angle_y = sc.center(pwm1, pwm2)
+        logger.info("test_move_both: recentered x=%s y=%s", angle_x, angle_y)
+        time.sleep(STEP_DELAY)
+        logger.info("test_move_both: move right")
+        right_x, right_y = sc.move_both(
+            (angle_x, angle_y),
+            (50, 50),
+            (70, 50),
+            step=5,
+            steps=5,
+            step_delay=0.05,
+        )
+        logger.info("test_move_both: after right x=%s y=%s", right_x, right_y)
+        assert right_x >= angle_x
+        time.sleep(STEP_DELAY)
+
+        # Move left (decrease x)
+        angle_x, angle_y = sc.center(pwm1, pwm2)
+        logger.info("test_move_both: recentered x=%s y=%s", angle_x, angle_y)
+        time.sleep(STEP_DELAY)
+        logger.info("test_move_both: move left")
+        left_x, left_y = sc.move_both(
+            (angle_x, angle_y),
+            (70, 50),
+            (50, 50),
+            step=5,
+            steps=5,
+            step_delay=0.05,
+        )
+        logger.info("test_move_both: after left x=%s y=%s", left_x, left_y)
+        assert left_x <= angle_x
         time.sleep(STEP_DELAY)
 
     finally:
