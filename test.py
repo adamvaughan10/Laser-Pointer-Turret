@@ -59,7 +59,7 @@ def test_move_both():
             (angle_x, angle_y),
             (50, 50),
             (50, 70),
-            step=10,
+            step=30,
             steps=4,
             step_delay=0.1,
         )
@@ -75,7 +75,7 @@ def test_move_both():
             (angle_x, angle_y),
             (50, 70),
             (50, 50),
-            step=10,
+            step=30,
             steps=4,
             step_delay=0.1,
         )
@@ -91,7 +91,7 @@ def test_move_both():
             (angle_x, angle_y),
             (50, 50),
             (70, 50),
-            step=10,
+            step=30,
             steps=4,
             step_delay=0.1,
         )
@@ -107,7 +107,7 @@ def test_move_both():
             (angle_x, angle_y),
             (70, 50),
             (50, 50),
-            step=10,
+            step=30,
             steps=4,
             step_delay=0.1,
         )
@@ -116,6 +116,7 @@ def test_move_both():
 
     finally:
         logger.info("test_move_both: cleanup GPIO")
+        sc.center(pwm1, pwm2)
         sc.cleanup_gpio(pwm1, pwm2)
 
 def run_all_tests():

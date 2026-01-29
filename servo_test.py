@@ -4,10 +4,10 @@ import servo_controller as sc
 
 SERVO1_PIN = 18  # BCM numbering
 SERVO2_PIN = 17
-TOP_MIN = 75
-TOP_MAX = 165
-BOTTOM_MIN = 40
-BOTTOM_MAX = 160
+TOP_MIN = 0
+TOP_MAX = 180
+BOTTOM_MIN = 0
+BOTTOM_MAX = 180
 MOVE_STEPS = 4
 MOVE_STEP_DELAY = 0.05
 
@@ -53,18 +53,18 @@ def prompt_angle(name, min_angle, max_angle):
 
 def main(pwm1, pwm2):
     print("Servo coordinate entry. Press q to quit.")
-    start1 = (TOP_MIN + TOP_MAX) // 2
-    start2 = (BOTTOM_MIN + BOTTOM_MAX) // 2
+    start1 = 90
+    start2 = 90
     current1, current2 = move_both(
         pwm1, start1, start1, pwm2, start2, start2, MOVE_STEPS, MOVE_STEP_DELAY
     )
     print("Moved to start")
     try:
         while True:
-            top_input = prompt_angle("Top", 0, 90)
+            top_input = prompt_angle("Top", 0, 180)
             if top_input is None:
                 break
-            bottom_input = prompt_angle("Bottom", 0, 120)
+            bottom_input = prompt_angle("Bottom", 0, 180)
             if bottom_input is None:
                 break
             target1 = TOP_MAX - top_input
@@ -80,8 +80,8 @@ def main(pwm1, pwm2):
 
 if __name__ == "__main__":
     pwm1, pwm2 = init_gpio()
-    start1 = (TOP_MIN + TOP_MAX) // 2
-    start2 = (BOTTOM_MIN + BOTTOM_MAX) // 2
+    start1 = 90
+    start2 = 90
     current1 = start1
     current2 = start2
     try:

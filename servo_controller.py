@@ -9,10 +9,10 @@ except ImportError:
 
 SERVO1_PIN = 18  # top (y-axis)
 SERVO2_PIN = 17  # bottom (x-axis)
-TOP_CENTER = 120
-BOTTOM_CENTER = 100
-TOP_BOUND = 10
-BOTTOM_BOUND = 10
+TOP_CENTER = 90
+BOTTOM_CENTER = 90
+TOP_BOUND = 20
+BOTTOM_BOUND = 20
 SERVO_MIN_PULSE = 0.0005
 SERVO_MAX_PULSE = 0.0025
 
@@ -204,7 +204,7 @@ def move_both_angles(pwm1, current1, target1, pwm2, current2, target2, steps, st
     return next_angle
 
 def center(pwm1, pwm2):
-    # Move to center position
+    # Move to center position TEMP MOVE TO BOUNDARY
     duty1 = angle_to_duty(TOP_CENTER)
     duty2 = angle_to_duty(BOTTOM_CENTER)
     pwm1.ChangeDutyCycle(duty1)

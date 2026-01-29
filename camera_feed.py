@@ -30,7 +30,7 @@ def setup_window(state):
     cv2.setMouseCallback(WINDOW_NAME, on_mouse, state)
 
 
-def process_frame(frame, state, threshold=170):
+def process_frame(frame, state, threshold=160):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     _, bw = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
     display = cv2.cvtColor(bw, cv2.COLOR_GRAY2BGR)
