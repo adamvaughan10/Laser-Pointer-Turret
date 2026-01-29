@@ -11,6 +11,12 @@ def parse_args():
     parser.add_argument("--start-y", type=int, default=None, help="Starting Y position.")
     parser.add_argument("--step", type=int, default=2, help="Step size per move.")
     parser.add_argument("--tolerance", type=int, default=2, help="Tolerance for navigate_to_target.")
+    parser.add_argument(
+        "--sequence",
+        type=str,
+        default="",
+        help='Scripted sequence, e.g. "g 120 90; h 130; v 80"',
+    )
     return parser.parse_args()
 
 
@@ -43,8 +49,19 @@ def main():
         print("  q           quit")
         print(f"Start: ({current_x}, {current_y}) step={args.step} tol={args.tolerance}")
 
+        if args.sequence:
+            commands = [cmd.strip() for cmd in args.sequence.split(";") if cmd.strip()]
+        else:
+            commands = None
+
         while True:
-            line = input("cmd> ").strip()
+            if commands is not None:
+                if not commands:
+                    break
+                line = commands.pop(0)
+                print(f"cmd> {line}")
+            else:
+                line = input("cmd> ").strip()
             if not line:
                 continue
             if line in ("q", "quit", "exit"):
