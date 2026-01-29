@@ -111,7 +111,6 @@ def navigate_to_target(get_position, target_location, current_angles, tolerance=
         if abs(current_x - target_x) > tolerance:
             angle_x = move_horiz(angle_x, current_x, target_x, step=step)
 
-        current_x, current_y = get_position()
     return (angle_x, angle_y)
 
 def move_vert(current_angle, current_y, target_y, step=2):
@@ -144,7 +143,7 @@ def move_horiz(current_angle, current_x, target_x, step=2):
     pwm1.ChangeDutyCycle(0)  # stop jitter
     return next_angle
 
-def startup(pwm1, pwm2):
+def center(pwm1, pwm2):
     # Move to center position
     center1 = (TOP_MIN + TOP_MAX) // 2
     center2 = (BOTTOM_MIN + BOTTOM_MAX) // 2

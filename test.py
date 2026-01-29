@@ -73,7 +73,7 @@ def test_move_horiz():
 
     try:
         logger.info("test_move_horiz: startup")
-        angles = sc.startup(pwm1, pwm2)
+        angles = sc.center(pwm1, pwm2)
 
         # Test moving right
         logger.info("test_move_horiz: move right")

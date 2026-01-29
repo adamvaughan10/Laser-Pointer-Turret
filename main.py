@@ -37,7 +37,7 @@ def main():
         sc.pwm1 = pwm1
         sc.pwm2 = pwm2
 
-        angles = sc.startup(pwm1, pwm2)
+        angles = sc.center(pwm1, pwm2)
 
         while True:
             ret, frame = cap.read()
@@ -61,6 +61,7 @@ def main():
             if key in (ord("q"), 27):
                 break
     finally:
+        sc.center(pwm1, pwm2)
         cap.release()
         cv2.destroyAllWindows()
         if pwm1 is not None and pwm2 is not None:
