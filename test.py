@@ -83,14 +83,14 @@ def test_move_horiz():
         time.sleep(STEP_DELAY)
         # Test moving right
         logger.info("test_move_horiz: move right")
-        new_angle = sc.move_horiz(angle_x, 50, 70, step=5)
+        new_angle = sc.move_horiz(angle_x, 50, 70, step=20)
         logger.info("test_move_horiz: new angle %s", new_angle)
         assert new_angle > angle_x
         time.sleep(STEP_DELAY)
 
         # Test moving left
         logger.info("test_move_horiz: move left")
-        new_angle = sc.move_horiz(angle_x, 70, 50, step=5)
+        new_angle = sc.move_horiz(angle_x, 70, 50, step=20)
         logger.info("test_move_horiz: new angle %s", new_angle)
         assert new_angle < angle_x
         time.sleep(STEP_DELAY)
