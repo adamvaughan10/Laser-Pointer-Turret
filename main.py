@@ -22,6 +22,7 @@ def main():
     pwm1 = None
     pwm2 = None
     last_click_seen = None
+    manual_step = 5
 
     def get_position():
         ret, frame = cap.read()
@@ -60,6 +61,18 @@ def main():
             cv2.imshow(cf.WINDOW_NAME, display)
             cv2.imshow(cf.COLOR_WINDOW_NAME, frame)
             key = cv2.waitKey(1) & 0xFF
+            if key in (81, 82, 83, 84, ord("w"), ord("a"), ord("s"), ord("d")):
+                new_x, new_y = angles
+                if key in (82, ord("w")):  # up
+                    new_y = sc.clamp(new_y - manual_step, "top")
+                elif key in (84, ord("s")):  # down
+                    new_y = sc.clamp(new_y + manual_step, "top")
+                elif key in (81, ord("a")):  # left
+                    new_x = sc.clamp(new_x - manual_step, "bottom")
+                elif key in (83, ord("d")):  # right
+                    new_x = sc.clamp(new_x + manual_step, "bottom")
+                sc.move_both_angles(pwm1, angles[1], new_y, pwm2, angles[0], new_x, 1, 0.02)
+                angles = (new_x, new_y)
             if key in (ord("q"), 27):
                 break
     except KeyboardInterrupt:
