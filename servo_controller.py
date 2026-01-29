@@ -30,7 +30,13 @@ def duty_to_angle(duty):
     angle = (duty - 2.5) / 10.0 * 180.0
     return max(0.0, min(180.0, angle))
 
-def clamp(value, min_value, max_value):
+def clamp(value, top_or_bottom):
+    if (top_or_bottom == "top"):
+        min_value = TOP_CENTER - TOP_BOUND
+        max_value = TOP_CENTER + TOP_BOUND
+    else:
+        min_value = BOTTOM_CENTER - BOTTOM_BOUND
+        max_value = BOTTOM_CENTER + BOTTOM_BOUND
     return max(min_value, min(max_value, value))
 
 class ServoAdapter:
@@ -126,13 +132,11 @@ def move_both(current_angles, current_location, target_location, step=2, steps=1
 
     target_angle_x = clamp(
         angle_x + direction_x * step,
-        TOP_CENTER - TOP_BOUND,
-        TOP_CENTER + TOP_BOUND,
+        top_or_bottom="bottom",
     )
     target_angle_y = clamp(
         angle_y + direction_y * step,
-        BOTTOM_CENTER - BOTTOM_BOUND,
-        BOTTOM_CENTER + BOTTOM_BOUND,
+        top_or_bottom="top",
     )
 
     return move_both_angles(
@@ -158,26 +162,26 @@ def move_both_angles(pwm1, current1, target1, pwm2, current2, target2, steps, st
     pwm2.ChangeDutyCycle(0)  # stop jitter
     return target1, target2
 
-def move_vert(current_angle, current_y, target_y, step=2):
-    direction = 1 if target_y > current_y else -1
-    # next_y = current_y + direction * step
-    # if direction > 0:
-    #     next_y = min(next_y, target_y)
-    # else:
-    #     next_y = max(next_y, target_y)
-    # next_y = max(BOTTOM_MIN, min(BOTTOM_MAX, next_y))
-    next_angle = clamp(
-        current_angle + direction * step,
-        BOTTOM_CENTER - BOTTOM_BOUND,
-        BOTTOM_CENTER + BOTTOM_BOUND,
-    )
-    duty = angle_to_duty(next_angle)
-    pwm2.ChangeDutyCycle(duty)
-    time.sleep(0.05)
-    pwm2.ChangeDutyCycle(0)  # stop jitter
-    return next_angle
+# def move_vert(current_angle, current_y, target_y, step=2):
+#     direction = 1 if target_y > current_y else -1
+#     # next_y = current_y + direction * step
+#     # if direction > 0:
+#     #     next_y = min(next_y, target_y)
+#     # else:
+#     #     next_y = max(next_y, target_y)
+#     # next_y = max(BOTTOM_MIN, min(BOTTOM_MAX, next_y))
+#     next_angle = clamp(
+#         current_angle + direction * step,
+#         BOTTOM_CENTER - BOTTOM_BOUND,
+#         BOTTOM_CENTER + BOTTOM_BOUND,
+#     )
+#     duty = angle_to_duty(next_angle)
+#     pwm2.ChangeDutyCycle(duty)
+#     time.sleep(0.05)
+#     pwm2.ChangeDutyCycle(0)  # stop jitter
+#     return next_angle
 
-def move_horiz(current_angle, current_x, target_x, step=2):
+# def move_horiz(current_angle, current_x, target_x, step=2):
     direction = 1 if target_x > current_x else -1
     # next_x = current_x + direction * step
     # if direction > 0:
