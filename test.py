@@ -6,18 +6,6 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
 
-def make_position_simulator(start, target, step):
-    current = [start[0], start[1]]
-
-    def get_position():
-        for i in (0, 1):
-            if current[i] < target[i]:
-                current[i] = min(current[i] + step, target[i])
-            elif current[i] > target[i]:
-                current[i] = max(current[i] - step, target[i])
-        return (current[0], current[1])
-
-    return get_position
 
 # def test_navigate_to_target():
 #     logger.info("test_navigate_to_target: setup GPIO")
