@@ -31,6 +31,7 @@ def move_both(pwm1, current1, target1, pwm2, current2, target2, steps, step_dela
         pwm1.ChangeDutyCycle(angle_to_duty(pos1))
         pwm2.ChangeDutyCycle(angle_to_duty(pos2))
         time.sleep(step_delay)
+        print(f"Moved to: top={pos1:.1f}, bottom={pos2:.1f}")
 
     pwm1.ChangeDutyCycle(0)  # stop jitter
     pwm2.ChangeDutyCycle(0)  # stop jitter

@@ -7,12 +7,12 @@ try:
 except ImportError:
     LGPIOFactory = None
 
-SERVO1_PIN = 18  #y-axis
-SERVO2_PIN = 17  #x-axis
-TOP_MIN = 70
-TOP_MAX = 110
-BOTTOM_MIN = 70
-BOTTOM_MAX = 110
+SERVO1_PIN = 18  # y-axis
+SERVO2_PIN = 17  # x-axis
+TOP_CENTER = 120
+BOTTOM_CENTER = 100
+TOP_BOUND = 10
+BOTTOM_BOUND = 10
 SERVO_MIN_PULSE = 0.0005
 SERVO_MAX_PULSE = 0.0025
 
@@ -124,8 +124,16 @@ def move_both(current_angles, current_location, target_location, step=2, steps=1
     direction_x = 1 if target_x > current_x else -1 if target_x < current_x else 0
     direction_y = 1 if target_y > current_y else -1 if target_y < current_y else 0
 
-    target_angle_x = clamp(angle_x + direction_x * step, TOP_MIN, TOP_MAX)
-    target_angle_y = clamp(angle_y + direction_y * step, BOTTOM_MIN, BOTTOM_MAX)
+    target_angle_x = clamp(
+        angle_x + direction_x * step,
+        TOP_CENTER - TOP_BOUND,
+        TOP_CENTER + TOP_BOUND,
+    )
+    target_angle_y = clamp(
+        angle_y + direction_y * step,
+        BOTTOM_CENTER - BOTTOM_BOUND,
+        BOTTOM_CENTER + BOTTOM_BOUND,
+    )
 
     return move_both_angles(
         pwm1,
@@ -158,7 +166,11 @@ def move_vert(current_angle, current_y, target_y, step=2):
     # else:
     #     next_y = max(next_y, target_y)
     # next_y = max(BOTTOM_MIN, min(BOTTOM_MAX, next_y))
-    next_angle = clamp(current_angle + direction * step, BOTTOM_MIN, BOTTOM_MAX)
+    next_angle = clamp(
+        current_angle + direction * step,
+        BOTTOM_CENTER - BOTTOM_BOUND,
+        BOTTOM_CENTER + BOTTOM_BOUND,
+    )
     duty = angle_to_duty(next_angle)
     pwm2.ChangeDutyCycle(duty)
     time.sleep(0.05)
@@ -173,7 +185,11 @@ def move_horiz(current_angle, current_x, target_x, step=2):
     # else:
     #     next_x = max(next_x, target_x)
     # next_x = max(TOP_MIN, min(TOP_MAX, next_x))
-    next_angle = clamp(current_angle + direction * step, TOP_MIN, TOP_MAX)
+    next_angle = clamp(
+        current_angle + direction * step,
+        TOP_CENTER - TOP_BOUND,
+        TOP_CENTER + TOP_BOUND,
+    )
     duty = angle_to_duty(next_angle)
     pwm1.ChangeDutyCycle(duty)
     time.sleep(0.05)
@@ -182,13 +198,11 @@ def move_horiz(current_angle, current_x, target_x, step=2):
 
 def center(pwm1, pwm2):
     # Move to center position
-    center1 = (TOP_MIN + TOP_MAX) // 2
-    center2 = (BOTTOM_MIN + BOTTOM_MAX) // 2
-    duty1 = angle_to_duty(center1)
-    duty2 = angle_to_duty(center2)
+    duty1 = angle_to_duty(TOP_CENTER)
+    duty2 = angle_to_duty(BOTTOM_CENTER)
     pwm1.ChangeDutyCycle(duty1)
     pwm2.ChangeDutyCycle(duty2)
     time.sleep(1)
     pwm1.ChangeDutyCycle(0)
     pwm2.ChangeDutyCycle(0)
-    return center2, center1 # return current angles
+    return BOTTOM_CENTER, TOP_CENTER  # return current angles
