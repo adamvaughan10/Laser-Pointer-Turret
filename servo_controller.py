@@ -138,6 +138,7 @@ def move_both(current_angles, current_location, target_location, step=2, steps=1
         angle_y + direction_y * step,
         top_or_bottom="top"
     )
+    print(f"Target angles: top={target_angle_y}, bottom={target_angle_x}")
 
     return move_both_angles(
         pwm1,

@@ -60,8 +60,8 @@ def test_move_both():
             (50, 50),
             (50, 70),
             step=10,
-            steps=5,
-            step_delay=0.05,
+            steps=4,
+            step_delay=0.1,
         )
         logger.info("test_move_both: after up x=%s y=%s", up_x, up_y)
         time.sleep(STEP_DELAY)
@@ -76,8 +76,8 @@ def test_move_both():
             (50, 70),
             (50, 50),
             step=10,
-            steps=5,
-            step_delay=0.05,
+            steps=4,
+            step_delay=0.1,
         )
         logger.info("test_move_both: after down x=%s y=%s", down_x, down_y)
         time.sleep(STEP_DELAY)
@@ -92,8 +92,8 @@ def test_move_both():
             (50, 50),
             (70, 50),
             step=10,
-            steps=5,
-            step_delay=0.05,
+            steps=4,
+            step_delay=0.1,
         )
         logger.info("test_move_both: after right x=%s y=%s", right_x, right_y)
         time.sleep(STEP_DELAY)
@@ -108,8 +108,8 @@ def test_move_both():
             (70, 50),
             (50, 50),
             step=10,
-            steps=5,
-            step_delay=0.05,
+            steps=4,
+            step_delay=0.1,
         )
         logger.info("test_move_both: after left x=%s y=%s", left_x, left_y)
         time.sleep(STEP_DELAY)
