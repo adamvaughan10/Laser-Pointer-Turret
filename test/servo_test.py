@@ -1,5 +1,6 @@
-import RPi.GPIO as GPIO
 import time
+
+import servo_controller as sc
 
 SERVO1_PIN = 18  # BCM numbering
 SERVO2_PIN = 17
@@ -15,24 +16,13 @@ def angle_to_duty(angle):
     Convert angle (0–180) to duty cycle.
     MG995 typically works well with ~2.5–12.5%.
     """
-    return 2.5 + (angle / 180.0) * 10.0
+    return sc.angle_to_duty(angle)
 
 def init_gpio():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(SERVO1_PIN, GPIO.OUT)
-    GPIO.setup(SERVO2_PIN, GPIO.OUT)
-
-    # 50 Hz PWM (20 ms period)
-    pwm1 = GPIO.PWM(SERVO1_PIN, 50)
-    pwm2 = GPIO.PWM(SERVO2_PIN, 50)
-    pwm1.start(0)
-    pwm2.start(0)
-    return pwm1, pwm2
+    return sc.init_gpio()
 
 def cleanup_gpio(pwm1, pwm2):
-    pwm1.stop()
-    pwm2.stop()
-    GPIO.cleanup()
+    sc.cleanup_gpio(pwm1, pwm2)
 
 def move_both(pwm1, current1, target1, pwm2, current2, target2, steps, step_delay):
     for i in range(1, steps + 1):

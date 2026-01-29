@@ -1,5 +1,11 @@
-import RPi.GPIO as GPIO
 import time
+
+from gpiozero import AngularServo, Device
+
+try:
+    from gpiozero.pins.lgpio import LGPIOFactory
+except ImportError:
+    LGPIOFactory = None
 
 SERVO1_PIN = 18  #y-axis
 SERVO2_PIN = 17  #x-axis
@@ -7,6 +13,11 @@ TOP_MIN = 75
 TOP_MAX = 165
 BOTTOM_MIN = 40
 BOTTOM_MAX = 160
+SERVO_MIN_PULSE = 0.0005
+SERVO_MAX_PULSE = 0.0025
+
+pwm1 = None
+pwm2 = None
 
 def angle_to_duty(angle):
     """
@@ -15,32 +26,64 @@ def angle_to_duty(angle):
     """
     return 2.5 + (angle / 180.0) * 10.0
 
-def init_gpio():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(SERVO1_PIN, GPIO.OUT)
-    GPIO.setup(SERVO2_PIN, GPIO.OUT)
+def duty_to_angle(duty):
+    angle = (duty - 2.5) / 10.0 * 180.0
+    return max(0.0, min(180.0, angle))
 
-    # 50 Hz PWM (20 ms period)
-    pwm1 = GPIO.PWM(SERVO1_PIN, 50)
-    pwm2 = GPIO.PWM(SERVO2_PIN, 50)
-    pwm1.start(0)
-    pwm2.start(0)
-    return pwm1, pwm2
+class ServoAdapter:
+    def __init__(self, servo):
+        self._servo = servo
+
+    def ChangeDutyCycle(self, duty):
+        if duty <= 0:
+            self._stop()
+            return
+        self._servo.angle = duty_to_angle(duty)
+
+    def stop(self):
+        self._stop()
+
+    def close(self):
+        self._servo.close()
+
+    def _stop(self):
+        if hasattr(self._servo, "detach"):
+            self._servo.detach()
+        else:
+            try:
+                self._servo.value = None
+            except Exception:
+                pass
+
+def init_gpio():
+    if LGPIOFactory is not None and not isinstance(Device.pin_factory, LGPIOFactory):
+        Device.pin_factory = LGPIOFactory()
+
+    servo1 = AngularServo(
+        SERVO1_PIN,
+        min_angle=0,
+        max_angle=180,
+        min_pulse_width=SERVO_MIN_PULSE,
+        max_pulse_width=SERVO_MAX_PULSE,
+    )
+    servo2 = AngularServo(
+        SERVO2_PIN,
+        min_angle=0,
+        max_angle=180,
+        min_pulse_width=SERVO_MIN_PULSE,
+        max_pulse_width=SERVO_MAX_PULSE,
+    )
+    return ServoAdapter(servo1), ServoAdapter(servo2)
 
 def cleanup_gpio(pwm1, pwm2):
     if pwm1 is not None:
         pwm1.stop()
+        if hasattr(pwm1, "close"):
+            pwm1.close()
     if pwm2 is not None:
         pwm2.stop()
-    # Force PWM __del__ to run before GPIO.cleanup to avoid lgpio errors.
-    try:
-        import gc
-
-        del pwm1
-        del pwm2
-        gc.collect()
-    finally:
-        GPIO.cleanup()
+        if hasattr(pwm2, "close"):
+            pwm2.close()
 
 def navigate_to_target(get_position, target_location, current_angles, tolerance=3, step=2, max_steps=200):
     """
@@ -51,7 +94,7 @@ def navigate_to_target(get_position, target_location, current_angles, tolerance=
     target_x, target_y = target_location
     current_x, current_y = get_position()
 
-   for _ in range(max_steps):
+    for _ in range(max_steps):
         current = get_position()
         if current is None:
             return None
