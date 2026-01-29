@@ -45,11 +45,11 @@ def navigate_to_target(current_location, target_location, tolerance=2, step=2):
 
         # Move vertically if needed
         if abs(current_y - target_y) > tolerance:
-            current_y = move_vert(current_y, target_y, step=step, tolerance=tolerance)
+            current_y = move_vert(current_y, target_y, step=step)
 
         # Move horizontally if needed
         if abs(current_x - target_x) > tolerance:
-            current_x = move_horiz(current_x, target_x, step=step, tolerance=tolerance)
+            current_x = move_horiz(current_x, target_x, step=step)
 
     return (current_x, current_y)
 
