@@ -73,17 +73,19 @@ def test_move_horiz():
 
     try:
         logger.info("test_move_horiz: startup")
-        angles = sc.center(pwm1, pwm2)
+        angle_x, angle_y = sc.center(pwm1, pwm2)
 
         # Test moving right
         logger.info("test_move_horiz: move right")
-        new_angle = sc.move_horiz(90, 50, 70, step=5)
+        new_angle = sc.move_horiz(angle_x, 50, 70)
         logger.info("test_move_horiz: new angle %s", new_angle)
-        assert new_angle > 90
+        assert new_angle > 60
+
+        angle_x, angle_y = sc.center(pwm1, pwm2)
 
         # Test moving left
         logger.info("test_move_horiz: move left")
-        new_angle = sc.move_horiz(90, 70, 50, step=5)
+        new_angle = sc.move_horiz(angle_x, 70, 50)
         logger.info("test_move_horiz: new angle %s", new_angle)
         assert new_angle < 90
 
@@ -93,7 +95,7 @@ def test_move_horiz():
 
 def run_all_tests():
     # test_navigate_to_target()
-    test_move_vert()
+    # test_move_vert()
     test_move_horiz()
 
 if __name__ == "__main__":

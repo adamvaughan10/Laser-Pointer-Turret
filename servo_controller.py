@@ -123,9 +123,9 @@ def move_vert(current_angle, current_y, target_y, step=2):
     # next_y = max(BOTTOM_MIN, min(BOTTOM_MAX, next_y))
     next_angle = current_angle + direction * step
     duty = angle_to_duty(next_angle)
-    pwm2.ChangeDutyCycle(duty)
+    pwm1.ChangeDutyCycle(duty)
     time.sleep(0.05)
-    pwm2.ChangeDutyCycle(0)  # stop jitter
+    pwm1.ChangeDutyCycle(0)  # stop jitter
     return next_angle
 
 def move_horiz(current_angle, current_x, target_x, step=2):
@@ -138,9 +138,9 @@ def move_horiz(current_angle, current_x, target_x, step=2):
     # next_x = max(TOP_MIN, min(TOP_MAX, next_x))
     next_angle = current_angle + direction * step
     duty = angle_to_duty(next_angle)
-    pwm1.ChangeDutyCycle(duty)
+    pwm2.ChangeDutyCycle(duty)
     time.sleep(0.05)
-    pwm1.ChangeDutyCycle(0)  # stop jitter
+    pwm2.ChangeDutyCycle(0)  # stop jitter
     return next_angle
 
 def center(pwm1, pwm2):
