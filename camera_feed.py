@@ -4,6 +4,7 @@ import cv2
 
 
 WINDOW_NAME = "Camera Feed"
+COLOR_WINDOW_NAME = "Color Feed"
 
 
 def get_current_dot_location(state):
@@ -28,6 +29,8 @@ def init_camera(index, width=0, height=0):
 def setup_window(state):
     cv2.namedWindow(WINDOW_NAME)
     cv2.setMouseCallback(WINDOW_NAME, on_mouse, state)
+    cv2.namedWindow(COLOR_WINDOW_NAME)
+    cv2.setMouseCallback(COLOR_WINDOW_NAME, on_mouse, state)
 
 
 def process_frame(frame, state, threshold=160):
@@ -109,6 +112,7 @@ def main():
         display, _ = process_frame(frame, state)
 
         cv2.imshow(WINDOW_NAME, display)
+        cv2.imshow(COLOR_WINDOW_NAME, frame)
         key = cv2.waitKey(1) & 0xFF
         if key in (ord("q"), 27):
             break

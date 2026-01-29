@@ -29,6 +29,7 @@ def main():
             return None
         display, _ = cf.process_frame(frame, state)
         cv2.imshow(cf.WINDOW_NAME, display)
+        cv2.imshow(cf.COLOR_WINDOW_NAME, frame)
         cv2.waitKey(1)
         return cf.get_current_dot_location(state)
 
@@ -57,11 +58,15 @@ def main():
                 last_click_seen = click
 
             cv2.imshow(cf.WINDOW_NAME, display)
+            cv2.imshow(cf.COLOR_WINDOW_NAME, frame)
             key = cv2.waitKey(1) & 0xFF
             if key in (ord("q"), 27):
                 break
+    except KeyboardInterrupt:
+        print("Interrupted; recentering servos.")
     finally:
-        sc.center(pwm1, pwm2)
+        if pwm1 is not None and pwm2 is not None:
+            sc.center(pwm1, pwm2)
         cap.release()
         cv2.destroyAllWindows()
         if pwm1 is not None and pwm2 is not None:
