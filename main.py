@@ -23,6 +23,15 @@ def main():
     pwm2 = None
     last_click_seen = None
 
+    def get_position():
+        ret, frame = cap.read()
+        if not ret:
+            return None
+        display, _ = cf.process_frame(frame, state)
+        cv2.imshow(cf.WINDOW_NAME, display)
+        cv2.waitKey(1)
+        return cf.get_current_dot_location(state)
+
     try:
         pwm1, pwm2 = sc.init_gpio()
         sc.pwm1 = pwm1
@@ -44,7 +53,7 @@ def main():
                 if current is None:
                     print("No dot detected; skipping navigate_to_target.")
                 else:
-                    sc.navigate_to_target(current, click, angles)
+                    sc.navigate_to_target(get_position, click, angles)
                 last_click_seen = click
 
             cv2.imshow(cf.WINDOW_NAME, display)

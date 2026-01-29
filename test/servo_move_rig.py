@@ -74,18 +74,33 @@ def main():
                 if cmd == "g" and len(parts) == 3:
                     target_x = int(parts[1])
                     target_y = int(parts[2])
-                    current_x, current_y = sc.navigate_to_target(
-                        (current_x, current_y),
+                    def get_position():
+                        nonlocal current_x, current_y
+                        if current_x < target_x:
+                            current_x = min(current_x + args.step, target_x)
+                        elif current_x > target_x:
+                            current_x = max(current_x - args.step, target_x)
+                        if current_y < target_y:
+                            current_y = min(current_y + args.step, target_y)
+                        elif current_y > target_y:
+                            current_y = max(current_y - args.step, target_y)
+                        return (current_x, current_y)
+
+                    result = sc.navigate_to_target(
+                        get_position,
                         (target_x, target_y),
+                        (current_x, current_y),
                         tolerance=args.tolerance,
                         step=args.step,
                     )
+                    if result is not None:
+                        current_x, current_y = result
                 elif cmd == "h" and len(parts) == 2:
                     target_x = int(parts[1])
-                    current_x = sc.move_horiz(current_x, target_x, step=args.step)
+                    current_x = sc.move_horiz(current_x, current_x, target_x, step=args.step)
                 elif cmd == "v" and len(parts) == 2:
                     target_y = int(parts[1])
-                    current_y = sc.move_vert(current_y, target_y, step=args.step)
+                    current_y = sc.move_vert(current_y, current_y, target_y, step=args.step)
                 else:
                     print("Invalid command. Use g x y | h x | v y | q")
                     continue

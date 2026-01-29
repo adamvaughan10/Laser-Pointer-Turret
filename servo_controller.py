@@ -42,26 +42,34 @@ def cleanup_gpio(pwm1, pwm2):
     finally:
         GPIO.cleanup()
 
-def navigate_to_target(current_location, target_location, angles, tolerance=2, step=2):
+def navigate_to_target(get_position, target_location, current_angles, tolerance=3, step=2, max_steps=200):
     """
-    current_location: tuple (x, y)
+    get_position: callable returning current (x, y) or None
     target_location: tuple (x, y)
     """
-    angles_y, angles_x = angles
-    current_x, current_y = current_location
+    angle_x, angle_y = current_angles
     target_x, target_y = target_location
+    current_x, current_y = get_position()
 
-    while abs(current_x - target_x) > tolerance or abs(current_y - target_y) > tolerance:
+   for _ in range(max_steps):
+        current = get_position()
+        if current is None:
+            return None
+        current_x, current_y = current
+
+        if abs(current_x - target_x) <= tolerance and abs(current_y - target_y) <= tolerance:
+            return (angle_x, angle_y)
 
         # Move vertically if needed
         if abs(current_y - target_y) > tolerance:
-            current_y = move_vert(current_y, target_y, step=step)
-
+            angle_y = move_vert(angle_y, current_y, target_y, step=step)
+    
         # Move horizontally if needed
         if abs(current_x - target_x) > tolerance:
-            current_x = move_horiz(current_x, target_x, step=step)
+            angle_x = move_horiz(angle_x, current_x, target_x, step=step)
 
-    return (current_x, current_y)
+        current_x, current_y = get_position()
+    return (angle_x, angle_y)
 
 def move_vert(current_angle, current_y, target_y, step=2):
     direction = 1 if target_y > current_y else -1
@@ -104,4 +112,4 @@ def startup(pwm1, pwm2):
     time.sleep(1)
     pwm1.ChangeDutyCycle(0)
     pwm2.ChangeDutyCycle(0)
-    return center1, center2 # return current angles
+    return center2, center1 # return current angles
