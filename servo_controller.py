@@ -127,7 +127,7 @@ def move_both(current_angles, current_location, target_location, step=2, steps=1
     current_x, current_y = current_location
     target_x, target_y = target_location
 
-    direction_x = 1 if target_x > current_x else -1 if target_x < current_x else 0
+    direction_x = 1 if target_x < current_x else -1 if target_x > current_x else 0
     direction_y = 1 if target_y > current_y else -1 if target_y < current_y else 0
 
     target_angle_x = clamp(
@@ -158,6 +158,7 @@ def move_both_angles(pwm1, current1, target1, pwm2, current2, target2, steps, st
         pwm1.ChangeDutyCycle(angle_to_duty(pos1))
         pwm2.ChangeDutyCycle(angle_to_duty(pos2))
         time.sleep(step_delay)
+        print(f"Moved to: top={pos1:.1f}, bottom={pos2:.1f}")
 
     pwm1.ChangeDutyCycle(0)  # stop jitter
     pwm2.ChangeDutyCycle(0)  # stop jitter

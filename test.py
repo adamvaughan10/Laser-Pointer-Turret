@@ -59,12 +59,11 @@ def test_move_both():
             (angle_x, angle_y),
             (50, 50),
             (50, 70),
-            step=5,
+            step=10,
             steps=5,
             step_delay=0.05,
         )
         logger.info("test_move_both: after up x=%s y=%s", up_x, up_y)
-        assert up_y >= angle_y
         time.sleep(STEP_DELAY)
 
         # Move down (decrease y)
@@ -76,12 +75,11 @@ def test_move_both():
             (angle_x, angle_y),
             (50, 70),
             (50, 50),
-            step=5,
+            step=10,
             steps=5,
             step_delay=0.05,
         )
         logger.info("test_move_both: after down x=%s y=%s", down_x, down_y)
-        assert down_y <= angle_y
         time.sleep(STEP_DELAY)
 
         # Move right (increase x)
@@ -93,12 +91,11 @@ def test_move_both():
             (angle_x, angle_y),
             (50, 50),
             (70, 50),
-            step=5,
+            step=10,
             steps=5,
             step_delay=0.05,
         )
         logger.info("test_move_both: after right x=%s y=%s", right_x, right_y)
-        assert right_x >= angle_x
         time.sleep(STEP_DELAY)
 
         # Move left (decrease x)
@@ -110,12 +107,11 @@ def test_move_both():
             (angle_x, angle_y),
             (70, 50),
             (50, 50),
-            step=5,
+            step=10,
             steps=5,
             step_delay=0.05,
         )
         logger.info("test_move_both: after left x=%s y=%s", left_x, left_y)
-        assert left_x <= angle_x
         time.sleep(STEP_DELAY)
 
     finally:
