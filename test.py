@@ -1,4 +1,5 @@
 import logging
+import time
 
 import servo_controller as sc
 
@@ -6,6 +7,7 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
 
+STEP_DELAY = 1
 
 # def test_navigate_to_target():
 #     logger.info("test_navigate_to_target: setup GPIO")
@@ -47,19 +49,22 @@ def test_move_vert():
 
     try:
         logger.info("test_move_vert: startup")
-        angles = sc.startup(pwm1, pwm2)
-
+        angle_x, angle_y = sc.center(pwm1, pwm2)
+        logger.info("test_move_vert: start angle %s", angle_y)
+        time.sleep(STEP_DELAY)
         # Test moving up
         logger.info("test_move_vert: move up")
-        new_angle = sc.move_vert(90, 50, 70, step=5)
+        new_angle = sc.move_vert(angle_y, 50, 70, step=5)
         logger.info("test_move_vert: new angle %s", new_angle)
-        assert new_angle > 90
+        assert new_angle > angle_y
+        time.sleep(STEP_DELAY)
 
         # Test moving down
         logger.info("test_move_vert: move down")
-        new_angle = sc.move_vert(90, 70, 50, step=5)
+        new_angle = sc.move_vert(angle_y, 70, 50, step=5)
         logger.info("test_move_vert: new angle %s", new_angle)
-        assert new_angle < 90
+        assert new_angle < angle_y
+        time.sleep(STEP_DELAY)
 
     finally:
         logger.info("test_move_vert: cleanup GPIO")
@@ -75,17 +80,20 @@ def test_move_horiz():
         logger.info("test_move_horiz: startup")
         angle_x, angle_y = sc.center(pwm1, pwm2)
         logger.info("test_move_horiz: start angle %s", angle_x)
+        time.sleep(STEP_DELAY)
         # Test moving right
         logger.info("test_move_horiz: move right")
         new_angle = sc.move_horiz(angle_x, 50, 70, step=5)
         logger.info("test_move_horiz: new angle %s", new_angle)
         assert new_angle > angle_x
+        time.sleep(STEP_DELAY)
 
         # Test moving left
         logger.info("test_move_horiz: move left")
-        new_angle = sc.move_horiz(90, 70, 50, step=5)
+        new_angle = sc.move_horiz(angle_x, 70, 50, step=5)
         logger.info("test_move_horiz: new angle %s", new_angle)
         assert new_angle < angle_x
+        time.sleep(STEP_DELAY)
 
     finally:
         logger.info("test_move_horiz: cleanup GPIO")
