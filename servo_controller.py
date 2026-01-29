@@ -128,7 +128,7 @@ def move_both(current_angles, current_location, target_location, step=2, steps=1
     target_x, target_y = target_location
 
     direction_x = 1 if target_x < current_x else -1 if target_x > current_x else 0
-    direction_y = 1 if target_y > current_y else -1 if target_y < current_y else 0
+    direction_y = -1 if target_y > current_y else 1 if target_y < current_y else 0
 
     target_angle_x = clamp(
         angle_x + direction_x * step,
