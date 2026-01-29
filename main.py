@@ -61,7 +61,14 @@ def main():
             cv2.imshow(cf.WINDOW_NAME, display)
             cv2.imshow(cf.COLOR_WINDOW_NAME, frame)
             key = cv2.waitKey(1) & 0xFF
-            if key in (81, 82, 83, 84, ord("w"), ord("a"), ord("s"), ord("d")):
+            if key == ord("r"):
+                state["dot_center"] = None
+                state["last_click"] = None
+                last_click_seen = None
+                if pwm1 is not None and pwm2 is not None:
+                    angles = sc.center(pwm1, pwm2)
+                print("Reset: cleared dot and recentered servos.")
+            elif key in (81, 82, 83, 84, ord("w"), ord("a"), ord("s"), ord("d")):
                 new_x, new_y = angles
                 if key in (82, ord("w")):  # up
                     new_y = sc.clamp(new_y - manual_step, "top")
